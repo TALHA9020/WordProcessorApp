@@ -169,9 +169,9 @@ then
 fi
 
 # Use "xargs" to parse quoted args.
-# Use -r1 to read as few lines as possible (prevents grep warning when empty).
+# Use -r to read as few lines as possible (prevents grep warning when empty).
 # Use '--' to separate the arguments to xargs from the command to run.
-set -- $(printf "%s\n" "$@" | xargs -r1 -n1 -- sh -c 'printf "%s\n" "$1"' --)
+set -- $(printf "%s\n" "$@" | xargs -r -n1 -- sh -c 'printf "%s\n" "$1"' --)
 
 # Default JVM options.
 DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
