@@ -106,50 +106,6 @@ location of your Java installation."
     fi
 fi
 
-# Increase the maximum file descriptors if we can.
-if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
-    case $MAX_FD in #(
-      max*)
-        # In POSIX sh, ulimit -H -n is unknown.
-        # shellcheck disable=SC3045
-        MAX_FD=$(ulimit -H -n)
-        ;;
-    esac
-fi
-
-# Collect all arguments for the java command, stacking in reverse order:
-#   * args from the command line
-#   * the main class name
-#   * -classpath
-#   * -D...appname settings
-#   * --module-path (only if needed)
-#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
-
-# For Cygwin or MSYS, switch paths to Windows format before running java
-if "$cygwin" || "$msys" ; then
-    APP_HOME=$(cygpath --path --mixed "$APP_HOME")
-    CLASSPATH=$(cygpath --path --mixed "$CLASSPATH")
-
-    JAVACMD=$(cygpath --unix "$JAVACMD")
-
-    # Now convert the arguments - kludge to limit ourselves to /bin/sh
-    for arg do
-        if
-            case $arg in                                #(
-              -*)   false ;;                            # don't mess with options #(
-              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
-                    [ -e "$t" ] ;;                      #(
-              *)    false ;;
-            esac
-        then
-            arg=$(cygpath --path --ignore --mixed "$arg")
-        fi
-        # Roll the args list around exactly as many times as the number of
-        # args, so each arg winds up back at the beginning.
-        set -- "$@" "$arg"
-    done
-fi
-
 # Collect all arguments for the java command;
 #   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
 #     shell script including quotes and variable substitutions, so put them in
@@ -161,12 +117,6 @@ set -- \
         -classpath "$CLASSPATH" \
         org.gradle.wrapper.GradleWrapperMain \
         "$@"
-
-# Stop when "xargs" is not available.
-if ! command -v xargs >/dev/null 2>&1
-then
-    die "xargs is not available"
-fi
 
 # Use "xargs" to parse quoted args.
 # Use -r to read as few lines as possible (prevents grep warning when empty).
