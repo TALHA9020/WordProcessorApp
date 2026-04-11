@@ -49,12 +49,10 @@ fun FormattingToolbar(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Bold, Italic, Underline
         IconButton(onClick = { viewModel.toggleBold() }) { Icon(Icons.Default.FormatBold, null) }
         IconButton(onClick = { viewModel.toggleItalic() }) { Icon(Icons.Default.FormatItalic, null) }
         IconButton(onClick = { viewModel.toggleUnderline() }) { Icon(Icons.Default.FormatUnderlined, null) }
         
-        // Font family & size
         IconButton(onClick = { showFontDialog = true }) { Icon(Icons.Default.FontDownload, null) }
         
         var fontSize by remember { mutableStateOf(16.sp) }
@@ -65,36 +63,23 @@ fun FormattingToolbar(
             onFontSizeSelect(fontSize)
         }) { Text("${fontSize.value.toInt()}px") }
         
-        // Color & highlight
         IconButton(onClick = { showColorPicker = true }) { Icon(Icons.Default.FormatColorText, null) }
         IconButton(onClick = { showHighlightPicker = true }) { Icon(Icons.Default.Highlight, null) }
         
-        // RTL/LTR
         IconButton(onClick = { viewModel.setTextDirection(true) }) { Text("RTL", fontSize = 12.sp) }
         IconButton(onClick = { viewModel.setTextDirection(false) }) { Text("LTR", fontSize = 12.sp) }
         
-        // Line spacing
         IconButton(onClick = { showLineSpacingDialog = true }) { Icon(Icons.Default.FormatLineSpacing, null) }
-        
-        // Paragraph spacing
         IconButton(onClick = { showParaSpacingDialog = true }) { Text("¶", fontSize = 16.sp) }
-        
-        // First line indent
         IconButton(onClick = { viewModel.setFirstLineIndent(32.sp) }) { Text("📏", fontSize = 20.sp) }
-        
-        // Page settings
         IconButton(onClick = { showPageSettingsDialog = true }) { Icon(Icons.Default.Settings, null) }
-        
-        // Custom font upload
         IconButton(onClick = { fontPickerLauncher.launch("application/*") }) { Icon(Icons.Default.FileUpload, null) }
         
-        // Export
         IconButton(onClick = onExportTxt) { Text("TXT") }
         IconButton(onClick = onExportDoc) { Text("DOC") }
         IconButton(onClick = onExportPdf) { Text("PDF") }
     }
     
-    // Dialogs
     if (showFontDialog) FontSelectionDialog(onDismiss = { showFontDialog = false }, onFontSelected = onFontSelect)
     if (showColorPicker) ColorPickerDialog("فونٹ کلر", { showColorPicker = false }) { viewModel.setTextColor(it) }
     if (showHighlightPicker) ColorPickerDialog("ہائی لائٹ کلر", { showHighlightPicker = false }) { viewModel.setHighlightColor(it) }
@@ -165,14 +150,13 @@ fun PageSettingsDialog(
 @Composable
 fun LineSpacingDialog(onDismiss: () -> Unit, onSelect: (androidx.compose.ui.unit.TextUnit) -> Unit) {
     val options = listOf(1.0f, 1.15f, 1.5f, 2.0f)
-    var selected by remember { mutableStateOf(1.5f) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("لائن سپیسنگ") },
         text = {
             Column {
                 options.forEach { spacing ->
-                    TextButton(onClick = { selected = spacing; onSelect(spacing.sp) }) {
+                    TextButton(onClick = { onSelect(spacing.sp) }) {
                         Text("$spacing")
                     }
                 }
@@ -198,5 +182,82 @@ fun ParagraphSpacingDialog(onDismiss: () -> Unit, onSelect: (androidx.compose.ui
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text("ٹھیک ہے") } }
+    )
+}
+
+@Composable
+fun ColorPickerDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    onColorSelected: (Color) -> Unit
+) {
+    val colors = listOf(
+        Color.Black, Color.Red, Color.Blue, Color.Green,
+        Color.Yellow, Color.Magenta, Color.Cyan, Color.Gray,
+        Color(0xFFFF5722), Color(0xFF9C27B0), Color(0xFF4CAF50)
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column {
+                Text("رنگ منتخب کریں:")
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
+                ) {
+                    colors.forEach { color ->
+                        IconButton(
+                            onClick = { onColorSelected(color) },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .background(color, shape = MaterialTheme.shapes.small)
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("منسوخ") } }
+    )
+}
+
+@Composable
+fun FontSelectionDialog(
+    onDismiss: () -> Unit,
+    onFontSelected: (FontFamily) -> Unit
+) {
+    val fontList = listOf(
+        "System Default" to FontFamily.Default,
+        "Sans Serif" to FontFamily.SansSerif,
+        "Serif" to FontFamily.Serif,
+        "Monospace" to FontFamily.Monospace,
+        "Cursive" to FontFamily.Cursive
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("فونٹ منتخب کریں") },
+        text = {
+            Column {
+                fontList.forEach { (name, fontFamily) ->
+                    TextButton(
+                        onClick = { onFontSelected(fontFamily) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = name,
+                            fontFamily = fontFamily,
+                            fontSize = 18.sp
+                        )
+                    }
+                    Divider()
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("منسوخ") } }
     )
 }
