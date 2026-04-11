@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mohamedrejeb.richeditor.model.RichTextState
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 class RichTextEditorViewModel : ViewModel() {
     val richTextState = RichTextState()
     
-    // Text formatting
     fun toggleBold() = viewModelScope.launch {
         richTextState.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold))
     }
@@ -49,26 +47,15 @@ class RichTextEditorViewModel : ViewModel() {
     fun setHighlightColor(color: androidx.compose.ui.graphics.Color) = viewModelScope.launch {
         richTextState.toggleSpanStyle(androidx.compose.ui.text.SpanStyle(background = color))
     }
-    
-    // Paragraph spacing (line spacing and paragraph margin)
     fun setLineSpacing(lineHeight: TextUnit) = viewModelScope.launch {
         richTextState.toggleParagraphStyle(androidx.compose.ui.text.ParagraphStyle(lineHeight = lineHeight))
-    }
-    fun setParagraphSpacing(bottomMargin: TextUnit) = viewModelScope.launch {
-        // This is a custom implementation; we apply margin to each paragraph via HTML style later
-        richTextState.toggleParagraphStyle(androidx.compose.ui.text.ParagraphStyle())
-        // For simplicity, we'll store in a variable and apply when needed. Use a custom attribute.
-        // Actually, RichTextState doesn't have direct paragraph margin, so we handle via SpanStyle on block?
-        // Better: store a variable and use it in export. We'll keep a state variable.
     }
     fun setFirstLineIndent(indent: TextUnit) = viewModelScope.launch {
         richTextState.toggleParagraphStyle(androidx.compose.ui.text.ParagraphStyle(textIndent = indent))
     }
     
-    // Page settings (margin, page size) - these affect PDF export only
     var pageSize: String by mutableStateOf("A4")
     var marginType: String by mutableStateOf("normal")
-    
     fun setPageSize(size: String) { pageSize = size }
     fun setMarginType(type: String) { marginType = type }
 }
@@ -83,15 +70,17 @@ fun RichTextEditor(viewModel: RichTextEditorViewModel) {
     Column(modifier = Modifier.fillMaxSize()) {
         FormattingToolbar(
             viewModel = viewModel,
-            onExportTxt = { FileExportUtils.saveAsTxt(context, richTextState.getPlainText()) },
-            onExportDoc = { FileExportUtils.saveAsDoc(context, richTextState.toHtml()) },
+            onExportTxt = { 
+                val text = richTextState.text.toString()
+                FileExportUtils.saveAsTxt(context, text)
+            },
+            onExportDoc = { 
+                val html = richTextState.toHtml()
+                FileExportUtils.saveAsDoc(context, html)
+            },
             onExportPdf = { 
-                FileExportUtils.saveAsPdf(
-                    context, 
-                    richTextState.toHtml(),
-                    pageSize = viewModel.pageSize,
-                    marginType = viewModel.marginType
-                )
+                val html = richTextState.toHtml()
+                FileExportUtils.saveAsPdf(context, html, viewModel.pageSize, viewModel.marginType)
             },
             onFontSelect = { viewModel.setFontFamily(it) },
             onFontSizeSelect = { viewModel.setFontSize(it) },
@@ -101,8 +90,8 @@ fun RichTextEditor(viewModel: RichTextEditorViewModel) {
                 }
             },
             onLineSpacingChange = { viewModel.setLineSpacing(it) },
-            onParagraphSpacingChange = { /* store and apply in export */ },
-            onPageSettingsClick = { /* dialog handled in toolbar */ }
+            onParagraphSpacingChange = { },
+            onPageSettingsClick = { }
         )
         
         Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
