@@ -43,9 +43,7 @@ object FileExportUtils {
             }
             pdfDoc.setDefaultPageSize(pageSizeEnum)
             
-            // Use a font that supports Arabic/Urdu
-            val font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN) // Better: use a Unicode font like "NotoNaskhArabic-Regular.ttf"
-            // For real Arabic support, you would include a TTF asset. For simplicity, we'll use the default but warn.
+            val font = PdfFontFactory.createFont(StandardFonts.TIMES_ROMAN)
             val document = Document(pdfDoc)
             val marginMap = mapOf("normal" to 72f, "narrow" to 36f, "custom" to 50f)
             val margin = marginMap[marginType] ?: 72f
