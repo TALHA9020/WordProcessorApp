@@ -5,23 +5,19 @@ import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.toFontFamily
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
 object FontManager {
-    private var customTypeface: Typeface? = null
     private var customFontFamily: FontFamily? = null
 
     fun loadCustomFont(context: Context, uri: Uri, onComplete: (FontFamily) -> Unit) {
         try {
             val file = copyFontToCache(context, uri)
             val typeface = Typeface.createFromFile(file)
-            customTypeface = typeface
-            customFontFamily = typeface.toFontFamily()
-            onComplete(customFontFamily!!)
+            val fontFamily = FontFamily(typeface)
+            customFontFamily = fontFamily
+            onComplete(fontFamily)
         } catch (e: Exception) {
             e.printStackTrace()
         }
