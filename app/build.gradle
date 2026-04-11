@@ -47,7 +47,13 @@ dependencies {
     implementation 'com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc13'
     implementation 'com.itextpdf:itext7-core:7.2.5'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-    
-    // Force a specific Kotlin stdlib version to match the compiler
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+}
+
+// Force a specific version of Kotlin stdlib to match the compiler
+configurations.all {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-common:1.9.24'
+    }
 }
